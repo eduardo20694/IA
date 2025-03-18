@@ -4,6 +4,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import threading
+import os  # Importando para pegar a variável de ambiente PORT
 
 app = Flask(__name__)
 
@@ -63,7 +64,7 @@ def testar_conexao():
         cursor.execute("SELECT DATABASE();")
         db = cursor.fetchone()
         conn.close()
-        return jsonify({"message": f"Conexão bem-sucedida ao banco de dados: {db[0]}"})
+        return jsonify({"message": f"Conexão bem-sucedida ao banco de dados: {db[0]}"}), 200
     return jsonify({"erro": "Erro ao conectar ao banco de dados."}), 500
 
 # 🔹 Encontrar resposta usando similaridade de cosseno
@@ -112,4 +113,6 @@ def atualizar_dados():
     return jsonify({"message": "Atualização de dados iniciada."})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Pega a porta definida pela variável de ambiente do Render ou usa a 5000 como padrão
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
